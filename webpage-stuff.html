@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head
+    <title>Spotify Playlist Generator</title>
+    <link rel="stylesheet" type="text/css" href="frontend.css">
+</head>
+<body>
+    <h1>Spotify Playlist Generator</h1>
+
+    <form id="playlist-form" method="POST">
+        <label for="artist_name">Artist Name:</label><br>
+        <input type="text" id="artist_name" name="artist_name"><br>
+
+        <label for="playlist_name">Playlist Name:</label><br>
+        <input type="text" id="playlist_name" name="playlist_name"><br>
+
+        <label for="num_songs">Number of Songs:</label><br>
+        <input type="number" id="num_songs" name="num_songs"><br>
+
+        <input type="submit" id="submit" value="Create Playlist">
+    </form>
+
+    <script src="frontend.js"></script>
+</body>
+</html>
+
+<iframe
+    id="spotify-embed"
+    title="Spotify Embed: Generated Playlist "
+    width="50%"
+    height="100%"
+    frameBorder="0"
+    style="min-height: 640px;"
+    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+    loading="lazy"
+></iframe>
