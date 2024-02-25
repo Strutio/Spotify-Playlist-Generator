@@ -2,7 +2,7 @@ import spotipy
 import spotipy.util as util
 import pandas as pd
 from spotipy.oauth2 import SpotifyOAuth
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect, session, render_template
 from flask_cors import CORS
 
 def get_artist_id(sp, artist_name):
@@ -50,8 +50,6 @@ def create_playlist(sp, username, playlist_name, track_ids):
     
     return playlist_id
 
-
-
 def main(sp, username, artist_name, playlist_name, num_songs):
     # Get the artist's ID
     artist_id = get_artist_id(sp, artist_name)
@@ -69,9 +67,55 @@ def main(sp, username, artist_name, playlist_name, num_songs):
     return create_playlist(sp, username, playlist_name, track_ids)
 
 app = Flask(__name__)
+# Choose your apps secret key
+app.secret_key=''
 CORS(app)
-@app.route('/', methods=['POST'])
+sp_oauth = SpotifyOAuth(
+    scope = "playlist-modify-public",
+    # Your client_id
+    client_id = '',
+    # Your client_secret
+    client_secret = '',
+    # Your redirect_uri, e.g. http://localhost:8888/callback/
+    redirect_uri = ""
+)
+
+#Route for user to login to their Spotify account
+@app.route('/login')
+def login():
+
+    # Creating an auth url to store in session
+    auth_url = sp_oauth.get_authorize_url()
+    session["token_info"] = sp_oauth.get_cached_token()
+    return redirect(auth_url)
+
+@app.route('/callback')
+def callback():
+    token_info = sp_oauth.get_access_token(request.args["code"])
+    session["token_info"] = token_info
+    return redirect("/") 
+
+#Route to verify that the user has signed in before redirecting them to creating their playlist
+@app.route('/')
+def verify():
+    token_info = session.get("token_info", None)
+
+    if not token_info:
+        return render_template('authorization.html')
+
+    return render_template('create-playlist.html')
+
+@app.route('/create_playlist', methods=['POST'])
 def create_playlist_route():
+    token_info = session.get("token_info", None)
+
+    if not token_info:
+        return render_template("authorize.html")
+    
+    sp = spotipy.Spotify(auth=token_info["access_token"])
+    user_info = sp.current_user()
+    username = user_info['id']
+
     data = request.get_json()
 
     artist_name = data.get('artist_name')
@@ -83,22 +127,8 @@ def create_playlist_route():
 
     return jsonify({'playlist_id': playlist_id})
 
+
+
 if __name__ == '__main__':
-    scope = "playlist-modify-public"
-    # Your spotify username
-    username = ''
-    # Your client_id
-    client_id = ''
-    # Your client_secret
-    client_secret = ''
-    # Your redirect_uri, e.g. http://localhost:8888/callback/
-    redirect_uri = ''
 
-    token = util.prompt_for_user_token(username, scope, client_id, client_secret, redirect_uri)
-
-    if token:
-        sp = spotipy.Spotify(auth=token)
-    else:
-        print("Can't get token for", username)
-    
-    app.run(debug=True)
+    app.run(port=8888, debug=True)
