@@ -1,24 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="utf-8">
     <title>Spotify Playlist Generator</title>
     <link rel="stylesheet" href="/static/frontend.css">
-  </head>
+</head>
 <body>
     <h1>Spotify Playlist Generator</h1>
-    
-    <form id="playlist-form" method="POST">
-        <label for="artist_name">Artist Name:</label><br>
-        <input type="text" id="artist_name" name="artist_name"><br>
+    <button id="sign-out">Sign Out</button>
 
-        <label for="playlist_name">Playlist Name:</label><br>
-        <input type="text" id="playlist_name" name="playlist_name"><br>
-
-        <label for="num_songs">Number of Songs:</label><br>
-        <input type="number" id="num_songs" name="num_songs"><br>
-
-        <input type="submit" id="submit" value="Create Playlist">
-    </form>
+    <div id="playlist-form-container"></div>
 
     <script src="/static/frontend.js"></script>
 </body>
