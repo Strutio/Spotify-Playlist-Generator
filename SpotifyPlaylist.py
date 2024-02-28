@@ -4,6 +4,7 @@ import pandas as pd
 from spotipy.oauth2 import SpotifyOAuth
 from flask import Flask, request, jsonify, redirect, session, render_template
 from flask_cors import CORS
+import requests
 
 def get_artist_id(sp, artist_name):
     # Search for the artist
@@ -71,13 +72,13 @@ app = Flask(__name__)
 app.secret_key=''
 CORS(app)
 sp_oauth = SpotifyOAuth(
-    scope = "playlist-modify-public",
+    scope = "playlist-modify-public playlist-modify-private",
     # Your client_id
     client_id = '',
     # Your client_secret
     client_secret = '',
     # Your redirect_uri, e.g. http://localhost:8888/callback/
-    redirect_uri = ""
+    redirect_uri = "http://localhost:8888/callback"
 )
 
 #Route for user to login to their Spotify account
@@ -87,28 +88,37 @@ def login():
     # Creating an auth url to store in session
     auth_url = sp_oauth.get_authorize_url()
     session["token_info"] = sp_oauth.get_cached_token()
+    
     return redirect(auth_url)
 
 @app.route('/callback')
 def callback():
     token_info = sp_oauth.get_access_token(request.args["code"])
     session["token_info"] = token_info
+
     return redirect("/") 
 
 #Route to verify that the user has signed in before redirecting them to creating their playlist
 @app.route('/')
 def verify():
     token_info = session.get("token_info", None)
-
+    
     if not token_info:
         return render_template('authorization.html')
 
+    if sp_oauth.is_token_expired(token_info):
+        # Refresh the token
+        token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
+        session["token_info"] = token_info
+
     return render_template('create-playlist.html')
 
+#Route for the generation of the actual playlist
 @app.route('/create_playlist', methods=['POST'])
 def create_playlist_route():
     token_info = session.get("token_info", None)
 
+    # Checking if the token exists, otherwise we need to re-authorize
     if not token_info:
         return render_template("authorize.html")
     
@@ -116,6 +126,7 @@ def create_playlist_route():
     user_info = sp.current_user()
     username = user_info['id']
 
+    # Getting the json file that was generated from frontend.js containing the formData
     data = request.get_json()
 
     artist_name = data.get('artist_name')
@@ -128,7 +139,14 @@ def create_playlist_route():
     return jsonify({'playlist_id': playlist_id})
 
 
+@app.route('/sign_out')
+def sign_out():
+    session.clear()
+
+    # Redirect to the home page or login page
+    return redirect('/')
+
 
 if __name__ == '__main__':
-
+    
     app.run(port=8888, debug=True)
