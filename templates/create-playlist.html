@@ -25,3 +25,43 @@
     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
     loading="lazy"
 ></iframe>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <style>
+      .background--custom {
+        background-color: #272525;
+        width: 100vw;
+        height: 50vh;
+        position: absolute;
+        overflow: visible;
+        z-index: -2;
+        top: 0;
+        left: 0;
+      }
+      canvas#canvas {
+        z-index: -1;
+        position: absolute;
+        width: 100%;
+        height: 80%;
+        transform: rotate(15deg) scale(2) translateY(-50%);
+        --gradient-color-1: #1ED760; 
+        --gradient-color-2: #0066ff; 
+        --gradient-color-3: #d73dfd;  
+        --gradient-color-4: #fa7900;
+        --gradient-speed: 0.000006;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="background--custom">
+      <canvas id="canvas" />
+    </div>
+    <script src="https://cdn.jsdelivr.net/gh/greentfrapp/pocoloco@minigl/minigl.js"></script>
+    <script>
+    var gradient = new Gradient();
+    gradient.initGradient("#canvas");
+    </script>
+  </body>
+</html>
