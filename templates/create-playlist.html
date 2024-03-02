@@ -1,5 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+<html lang="en">
+  <head>
+      <meta charset="utf-8">
+      <title>Spotify Playlist Generator</title>
+  </head>
+  <body>
+      <script>
+            fetch('/get_spotify_token')
+              .then(response => response.json())
+              .then(data => {
+                  if (data.access_token) {
+                      // Save the access token to localStorage or perform actions as needed
+                      localStorage.setItem('spotifyToken', data.access_token);
+                      console.log('Got Spotify access token');
+                  } else {
+                      console.error('Error getting Spotify access token:', data.error);
+                   }
+              })
+              .catch(error => {
+                  console.error('Error:', error);
+              });
+      </script>
+  </body>
+  </html>
+
 <head>
     <meta charset="utf-8">
     <title>Spotify Playlist Generator</title>
@@ -12,6 +37,7 @@
     <div id="playlist-form-container"></div>
 
     <script src="/static/frontend.js"></script>
+    
 </body>
 </html>
 
@@ -35,7 +61,7 @@
         width: 100vw;
         height: 50vh;
         position: absolute;
-        overflow: visible;
+        overflow: hidden;
         z-index: -2;
         top: 0;
         left: 0;
@@ -45,7 +71,7 @@
         position: absolute;
         width: 100%;
         height: 80%;
-        transform: rotate(15deg) scale(2) translateY(-50%);
+        transform: rotate(0deg) scale(2) translateY(-50%);
         --gradient-color-1: #1ED760; 
         --gradient-color-2: #0066ff; 
         --gradient-color-3: #d73dfd;  
