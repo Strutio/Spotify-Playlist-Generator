@@ -20,7 +20,7 @@ function createForm(step) {
     if (currentStepData) {
         const label = document.createElement('label');
         label.for = currentStepData.name;
-        label.textContent = `${currentStepData.label}:`;
+        label.textContent = currentStepData.label;
         form.appendChild(label);
 
         const input = document.createElement('input');
@@ -111,7 +111,7 @@ document.getElementById('playlist-form-container').addEventListener('submit', fu
 // Event listener for sign-out
 document.getElementById('sign-out').addEventListener('click', function (e) {
     e.preventDefault();
-
+    
     fetch('/sign_out', {
         method: 'GET',
     })
