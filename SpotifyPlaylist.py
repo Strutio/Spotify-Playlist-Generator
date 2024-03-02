@@ -78,7 +78,7 @@ sp_oauth = SpotifyOAuth(
     # Your client_secret
     client_secret = '',
     # Your redirect_uri, e.g. http://localhost:8888/callback/
-    redirect_uri = "http://localhost:8888/callback"
+    redirect_uri = ""
 )
 
 #Route for user to login to their Spotify account
@@ -112,6 +112,22 @@ def verify():
         session["token_info"] = token_info
 
     return render_template('create-playlist.html')
+
+@app.route('/get_spotify_token')
+def get_spotify_token():
+    token_info = session.get("token_info", None)
+
+    if not token_info:
+        # Handle the case where there's no valid token
+        return jsonify({'error': 'No valid Spotify token'})
+
+    if sp_oauth.is_token_expired(token_info):
+        # Refresh the token
+        token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
+        session["token_info"] = token_info
+
+    return jsonify({'access_token': token_info["access_token"]})
+
 
 #Route for the generation of the actual playlist
 @app.route('/create_playlist', methods=['POST'])
