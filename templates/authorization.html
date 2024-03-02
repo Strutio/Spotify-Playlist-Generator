@@ -8,7 +8,8 @@
     <h1>Spotify Playlist Generator</h1>
     
     <form id="authorization-form" method="POST">
-        <button id="authorize-btn">Authorize Spotify</button>
+        <p id="intro-p">Generate Spotify Playlists based on your artist preferences</p>
+        <button id="authorize-btn">Connect to Spotify</button>
     </form>
 
     <script src="/static/authorize.js"></script>
@@ -35,7 +36,7 @@
         width: 100vw;
         height: 50vh;
         position: absolute;
-        overflow: visible;
+        overflow: hidden;
         z-index: -2;
         top: 0;
         left: 0;
@@ -45,7 +46,7 @@
         position: absolute;
         width: 100%;
         height: 80%;
-        transform: rotate(15deg) scale(2) translateY(-50%);
+        transform: rotate(0deg) scale(2) translateY(-50%);
         --gradient-color-1: #1ED760; 
         --gradient-color-2: #0066ff; 
         --gradient-color-3: #d73dfd;  
