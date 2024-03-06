@@ -28,12 +28,21 @@ function createForm(step) {
         input.id = currentStepData.name;
         input.name = currentStepData.name;
         // Populating with saved data
-        input.value = formData[currentStepData.name] || ''; 
+        input.value = formData[currentStepData.name] || '';
         // Updating data on input
         input.addEventListener('input', (e) => {
-            formData[currentStepData.name] = e.target.value; 
+            formData[currentStepData.name] = e.target.value;
+            
+            if (currentStepData.name === 'artist_name') {
+                handleArtistNameInputSuggestions(e.target);
+            }
         });
         form.appendChild(input);
+
+        const suggestionsContainer = document.createElement('div');
+        suggestionsContainer.id = 'autocomplete-suggestions';
+        suggestionsContainer.classList.add('autocomplete-suggestions');
+        form.appendChild(suggestionsContainer);
 
         const buttonContainer = document.createElement('div');
         buttonContainer.classList.add('button-container');
@@ -69,6 +78,68 @@ function createForm(step) {
     }
 }
 
+function handleArtistNameInputSuggestions(input) {
+    const suggestionsContainer = document.getElementById('autocomplete-suggestions');
+    const nextButton = document.querySelector('.next-button');
+
+    // Clear previous suggestions
+    suggestionsContainer.innerHTML = '';
+
+    // Get user input
+    const query = input.value.trim();
+
+    console.log('Query:', query);  // Log the query to see if it's reaching this point
+
+    // Fetch artist suggestions
+    if (query.length >= 3) {  // Adjust the minimum length as needed
+        fetchArtistSuggestions(query)
+            .then(suggestions => {
+                console.log('Suggestions:', suggestions);  // Log the suggestions to see if they are fetched
+                // Display suggestions
+                suggestions.forEach(suggestion => {
+                    const suggestionElement = document.createElement('div');
+                    suggestionElement.textContent = suggestion;
+                    suggestionElement.classList.add('suggestion');
+
+                    suggestionElement.addEventListener('click', () => {
+                        // Set the selected suggestion in the input field
+                        input.value = suggestion;
+                        // Clear suggestions
+                        suggestionsContainer.innerHTML = '';
+                    
+                        // Reset the position of the next button
+                        if (nextButton) {
+                            nextButton.style.marginTop = '0';
+                        }
+                    
+                        // Hide the suggestions container
+                        suggestionsContainer.classList.remove('show');
+                    });
+
+                    suggestionsContainer.appendChild(suggestionElement);
+                });
+                
+                // Show the suggestions container
+                suggestionsContainer.classList.add('show');
+                // Move the next button down
+                if (nextButton) {
+                    nextButton.style.marginTop = '170px'; // Adjust this value as needed
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching artist suggestions:', error);
+            });
+    } else {
+        // Hide the suggestions container if the input is less than 3 characters
+        suggestionsContainer.classList.remove('show');
+        // Reset the margin of the next button
+        if (nextButton) {
+            nextButton.style.marginTop = '0';
+        }
+    }
+}
+
+
 // Function to ensure we keep track of the proper steps
 function navigate(direction) {
     if (direction === 'next') {
@@ -86,14 +157,12 @@ function navigate(direction) {
 document.getElementById('playlist-form-container').addEventListener('submit', function (e) {
     e.preventDefault();
 
-    fetch('http://localhost:8888/create_playlist', {
-
+    fetch('http://127.0.0.1:8888/create_playlist', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
-
     })
         .then(response => response.json())
         .then(data => {
@@ -111,7 +180,7 @@ document.getElementById('playlist-form-container').addEventListener('submit', fu
 // Event listener for sign-out
 document.getElementById('sign-out').addEventListener('click', function (e) {
     e.preventDefault();
-    
+
     fetch('/sign_out', {
         method: 'GET',
     })
@@ -132,3 +201,31 @@ document.getElementById('sign-out').addEventListener('click', function (e) {
 
 // Initialize form on page load
 createForm(currentStep);
+
+// Event listener for artist name input
+const artistNameInput = document.getElementById('artist_name'); // Change 'artist_name' if your input has a different ID
+artistNameInput.addEventListener('input', (e) => {
+    formData['artist_name'] = e.target.value;
+    handleArtistNameInputSuggestions(artistNameInput);
+});
+
+
+// Function to fetch artist suggestions from Spotify API
+async function fetchArtistSuggestions(query) {
+    const accessToken = localStorage.getItem('spotifyToken');
+
+    const response = await fetch(`https://api.spotify.com/v1/search?q=${query}&type=artist`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+        },
+    });
+
+    const data = await response.json();
+
+    if (data.artists && data.artists.items) {
+        return data.artists.items.map(artist => artist.name);
+    } else {
+        return [];
+    }
+}
