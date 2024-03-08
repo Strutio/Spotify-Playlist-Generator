@@ -149,3 +149,30 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     margin-top: 20px;
 }
+
+.autocomplete-suggestions {
+    margin: auto;
+    width: 20%;
+    padding: 15px;
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    z-index: 1;
+    display: none; /* Initially hide it */
+}
+
+.autocomplete-suggestions.show {
+    display: block; /* Show it when there are suggestions */
+}
+
+.suggestion {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.suggestion:hover {
+    background-color: #f2f2f2;
+}
