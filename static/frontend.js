@@ -88,57 +88,77 @@ function handleArtistNameInputSuggestions(input) {
     // Get user input
     const query = input.value.trim();
 
-    console.log('Query:', query);  // Log the query to see if it's reaching this point
+    console.log('Query:', query);
 
     // Fetch artist suggestions
-    if (query.length >= 3) {  // Adjust the minimum length as needed
+    if (query.length >= 3) {
         fetchArtistSuggestions(query)
             .then(suggestions => {
-                console.log('Suggestions:', suggestions);  // Log the suggestions to see if they are fetched
+                console.log('Suggestions:', suggestions);
+
                 // Display suggestions
                 suggestions.forEach(suggestion => {
                     const suggestionElement = document.createElement('div');
-                    suggestionElement.textContent = suggestion;
                     suggestionElement.classList.add('suggestion');
+
+                    // Create a container for the artist info
+                    const artistContainer = document.createElement('div');
+                    artistContainer.classList.add('artist-container');
+
+                    // Create an image element for the artist
+                    if (suggestion.image) {
+                        const artistImage = document.createElement('img');
+                        artistImage.src = suggestion.image;
+                        artistImage.alt = suggestion.name;
+                        artistImage.classList.add('artist-image');
+                        // Apply styling changes here
+                        artistImage.style.width = '30px'; // Adjust the width as needed
+                        artistImage.style.height = '30px'; // Adjust the height as needed
+                        artistContainer.appendChild(artistImage);
+                    }
+
+                    // Create a span element for the artist name
+                    const artistName = document.createElement('span');
+                    artistName.textContent = suggestion.name;
+                    artistContainer.appendChild(artistName);
+
+                    suggestionElement.appendChild(artistContainer);
 
                     suggestionElement.addEventListener('click', () => {
                         // Set the selected suggestion in the input field
-                        input.value = suggestion;
+                        input.value = suggestion.name;
                         // Clear suggestions
                         suggestionsContainer.innerHTML = '';
-                    
+
                         // Reset the position of the next button
                         if (nextButton) {
                             nextButton.style.marginTop = '0';
                         }
-                    
+
                         // Hide the suggestions container
                         suggestionsContainer.classList.remove('show');
                     });
 
                     suggestionsContainer.appendChild(suggestionElement);
                 });
-                
+
                 // Show the suggestions container
                 suggestionsContainer.classList.add('show');
                 // Move the next button down
                 if (nextButton) {
-                    nextButton.style.marginTop = '170px'; // Adjust this value as needed
+                    nextButton.style.marginTop = '90px';
                 }
             })
             .catch(error => {
                 console.error('Error fetching artist suggestions:', error);
             });
     } else {
-        // Hide the suggestions container if the input is less than 3 characters
         suggestionsContainer.classList.remove('show');
-        // Reset the margin of the next button
         if (nextButton) {
             nextButton.style.marginTop = '0';
         }
     }
 }
-
 
 // Function to ensure we keep track of the proper steps
 function navigate(direction) {
@@ -224,7 +244,13 @@ async function fetchArtistSuggestions(query) {
     const data = await response.json();
 
     if (data.artists && data.artists.items) {
-        return data.artists.items.map(artist => artist.name);
+        return data.artists.items.map(artist => {
+            return {
+                name: artist.name,
+                id: artist.id,
+                image: artist.images.length > 0 ? artist.images[0].url : null,
+            };
+        });
     } else {
         return [];
     }
