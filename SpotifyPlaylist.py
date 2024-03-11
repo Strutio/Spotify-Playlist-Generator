@@ -78,7 +78,7 @@ sp_oauth = SpotifyOAuth(
     # Your client_secret
     client_secret = '',
     # Your redirect_uri, e.g. http://localhost:8888/callback/
-    redirect_uri = "http://localhost:8888/callback"
+    redirect_uri = "http://127.0.0.1:8888/callback"
 )
 
 #Route for user to login to their Spotify account
