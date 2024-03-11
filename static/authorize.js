@@ -3,5 +3,5 @@ document.getElementById('authorization-form').addEventListener('submit', functio
     
     // This prevents the default form submission behavior
 
-    window.location.href = 'http://localhost:8888/login';
+    window.location.href = 'http://127.0.0.1:8888/login';
 });
