@@ -176,3 +176,13 @@ body {
 .suggestion:hover {
     background-color: #f2f2f2;
 }
+
+/* Add this to your existing CSS or create a new CSS file */
+.artist-container {
+    display: flex;
+    align-items: center;
+}
+
+.artist-image {
+    margin-right: 10px; /* Adjust the margin as needed */
+}
