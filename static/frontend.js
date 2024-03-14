@@ -112,8 +112,8 @@ function handleArtistNameInputSuggestions(input) {
                         artistImage.alt = suggestion.name;
                         artistImage.classList.add('artist-image');
                         // Apply styling changes here
-                        artistImage.style.width = '30px'; // Adjust the width as needed
-                        artistImage.style.height = '30px'; // Adjust the height as needed
+                        artistImage.style.width = '50px'; // Adjust the width as needed
+                        artistImage.style.height = '50px'; // Adjust the height as needed
                         artistContainer.appendChild(artistImage);
                     }
 
@@ -146,7 +146,7 @@ function handleArtistNameInputSuggestions(input) {
                 suggestionsContainer.classList.add('show');
                 // Move the next button down
                 if (nextButton) {
-                    nextButton.style.marginTop = '90px';
+                    nextButton.style.marginTop = '50px';
                 }
             })
             .catch(error => {
